@@ -857,7 +857,12 @@ let
       HW_RANDOM = yes;
 
       MODULE_SIG = yes;
-      MODULE_SIG_ALL = no;
+      # 5.10 has a different module signing flow and is due for removal
+      # anyway, so we don’t try and support it.
+      MODULE_SIG_ALL = whenOlder "5.15" no;
+      # We use kmodigest to produce a deterministic single‐module
+      # certificate for each module. This prevents the kernel from
+      # generating its own ephemeral module signing key at build time.
       MODULE_SIG_KEY = freeform "";
 
       # Support ECDSA and ML‐DSA module signatures.

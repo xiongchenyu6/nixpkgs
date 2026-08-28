@@ -532,6 +532,23 @@ lib.makeOverridable (
 
       # Delete empty directories
       find -empty -type d -delete
+
+      # Replace the individual kmodigest single‐module certificates (see
+      # `common-flags.nix`) with a concatenated `modules.cer`.
+      cd "$modules/lib/modules/${modDirVersion}"
+      ${
+        if lib.versionAtLeast version "5.15" then
+          ''
+            sed 's/$/\.cer/' modules.order | xargs -d'\n' cat > modules.cer
+            sed 's/$/\.cer/' modules.order | xargs -d'\n' rm
+          ''
+        else
+          ''
+            # Linux 5.10 has a different signing flow and is due for
+            # removal, it’s not worth it to try and support here…
+            touch modules.cer
+          ''
+      }
     '';
 
     stripDebugList = [
